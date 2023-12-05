@@ -1,2 +1,6 @@
 server
 ./client/client
+./build
+./build/*
+build
+build/
