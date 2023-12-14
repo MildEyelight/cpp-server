@@ -5,8 +5,10 @@
 #include <cstring>
 #include <fcntl.h>
 #include "InetAddress.h"
+#include "error.h"
 
 class Socket{
+// 希望一个Sokcet对象能够唯一的维护一个file discriptor
 private:
     int _sockfd;
 
@@ -14,7 +16,11 @@ public:
     Socket(){
         _sockfd = socket(AF_INET, SOCK_STREAM, 0);
     }
-
+    Socket(Socket&& a){
+        _sockfd = a._sockfd;
+        a._sockfd = -1;
+    }
+    Socket(const Socket& a) = delete;
     Socket(int sockfd): _sockfd(sockfd){}
     
     ~Socket(){
@@ -44,7 +50,7 @@ public:
         struct sockaddr_in client_addr;
         socklen_t client_addr_len = sizeof(client_addr);
         int client_sockfd = ::accept(_sockfd, (sockaddr*)&client_addr, &client_addr_len); // accept 会发生阻塞。
-        if((client_sockfd) == -1, "Accept Socket Error\n");
+        errif(client_sockfd == -1, "Accept Socket Error\n");
         printf("New client fd %d, IP: %s, Port: %d\n", client_sockfd, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port)); 
     
         return Socket(client_sockfd);

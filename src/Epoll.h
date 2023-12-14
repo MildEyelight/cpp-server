@@ -2,6 +2,7 @@
 #include <sys/epoll.h>
 #include <vector>
 #include "Socket.h"
+#include "Channel.h"
 
 const int MAX_EVENTS = 128;
 
@@ -11,6 +12,7 @@ private:
     struct epoll_event ev;
     struct epoll_event events[MAX_EVENTS];
     std::vector<Socket*> client_socket;
+    std::vector<Channel*> listen_channel;
 public:
     Epoll(){
         _epfd = epoll_create(1024);
@@ -19,7 +21,7 @@ public:
     Epoll(const Epoll& a) = delete;
     
     ~Epoll(){
-        for(int i = 0; i < client_socket.size(); i ++){
+        for(int i = 0; i < (int)client_socket.size(); i ++){
             delete client_socket.at(i);
         }
     }
@@ -41,9 +43,27 @@ public:
     int add_socket(const Socket& a, int flag = EPOLLIN){
         return add_fd(a.get_sockfd(), flag);
     }
+    int update_channel(Channel* ch){
+        bzero(&ev, sizeof(ev));
+        ev.data.ptr = ch;
+        ev.events = ch->get_events();
+        if(ch->get_is_in_epoll()){
+            return  epoll_ctl(_epfd, EPOLL_CTL_MOD, ch->get_fd(), &ev);
+        }
+        else{
+            return epoll_ctl(_epfd, EPOLL_CTL_ADD, ch->get_fd(), &ev);
+        }
 
-    int wait(){
-        return epoll_wait(_epfd, events, MAX_EVENTS, -1);
+    }
+    std::vector<Channel*> wait(){
+        std::vector<Channel*> active_channels;
+        int nfds = epoll_wait(_epfd, events, MAX_EVENTS, -1);
+        for(int i = 0; i < nfds; i++){
+            Channel* ch = (Channel*) events[i].data.ptr;
+            ch->set_revents(events[i].events); 
+            active_channels.push_back(ch);
+        }
+        return active_channels;
     }
     const struct epoll_event* get_events() const{
         return events;

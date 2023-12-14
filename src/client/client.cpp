@@ -18,11 +18,11 @@ int main(){
     InetAddress server_address(SERVER_IP, SERVER_PORT);
     int rc = client_socket.connect(server_address);
     if(rc != -1){
-        printf("Connect to server successfully");
+        printf("Connect to server successfully. Server ip: %s, server port: %d\n", SERVER_IP, SERVER_PORT);
     }
     else{
         //可能是ECONNREFUSED 或者 ETIMEDOUT
-        printf("Connect Server Error");
+        printf("Connect Server Error\n");
         exit(-1);
     }
 
