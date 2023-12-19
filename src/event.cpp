@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include "Socket.h"
-const int MAX_BUFFER_SIZE = 1024;
 
 int handle_event(int client_sockfd){
     char buf[MAX_BUFFER_SIZE];

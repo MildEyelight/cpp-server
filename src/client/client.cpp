@@ -6,9 +6,9 @@
 #include <iostream>
 #include <string>
 
-#include "src/Socket.h"
-#include "src/InetAddress.h"
-#include "src/event.h"
+#include "Socket.h"
+#include "InetAddress.h"
+#include "event.h"
 
 const int SERVER_PORT = 11111;
 const char* SERVER_IP = "127.0.0.1";
