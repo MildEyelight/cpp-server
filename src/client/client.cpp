@@ -10,9 +10,6 @@
 #include "InetAddress.h"
 #include "event.h"
 
-const int SERVER_PORT = 11111;
-const char* SERVER_IP = "127.0.0.1";
-
 int main(){
     Socket client_socket;
     InetAddress server_address(SERVER_IP, SERVER_PORT);

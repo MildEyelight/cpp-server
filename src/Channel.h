@@ -6,7 +6,6 @@ class Epoll;
 class EventLoop;
 class Channel{
 private:
-	Epoll *ep;
 	EventLoop* loop;
 	int fd;
 	uint32_t events;
@@ -14,10 +13,12 @@ private:
 	bool is_in_epoll;
 	std::function<void()> cb;
 public:
-	Channel(Epoll* ep, int fd):ep(ep), fd(fd){}
 	Channel(EventLoop* loop, int fd): loop(loop), fd(fd){}
 	int get_fd() const {
 		return fd;
+	}
+	EventLoop* get_loop() const {
+		return loop;
 	}
 	uint32_t get_events() const {
 		return events;
@@ -31,9 +32,6 @@ public:
 	bool set_is_in_epoll(bool flag = true) {
 		is_in_epoll = true;
 		return flag;
-	}
-	Epoll* get_ep() const {
-		return ep;
 	}
 	void set_revents(const uint32_t rev) {
 		revents = rev;

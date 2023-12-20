@@ -4,13 +4,14 @@
 #include <memory>
 class EventLoop{
 private: 
-    Epoll *ep;
+    std::shared_ptr<Epoll> ep;
     bool quit;
 public:
-    EventLoop() = default;
+    EventLoop();
+    ~EventLoop();
     void loop();
     int update_channel(Channel* channel);
-    Epoll* get_epoll() const;
+    std::shared_ptr<Epoll> get_epoll() const;
 }
 ;
 
@@ -18,6 +19,7 @@ class Server{
 private:
     //Reactor
     std::shared_ptr<EventLoop> loop;
+    std::shared_ptr<class Acceptor> acceptor; 
 public:
     Server(std::shared_ptr<EventLoop>& loop);
     ~Server();
@@ -35,7 +37,11 @@ private:
     Socket* listen_socket;
     InetAddress* server_address;
     Channel* accept_channel;
+    std::function<void(Socket*)> new_connection_cb;
 public:
     Acceptor(EventLoop* loop);
+    void set_cb(std::function<void(Socket*)>& cb){
+        new_connection_cb = cb;
+    }
     void accept_connection();
 };
