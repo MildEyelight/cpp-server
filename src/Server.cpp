@@ -1,6 +1,7 @@
 #include "Server.h"
 #include "event.h"
 #include "Channel.h"
+#include "Connection.h"
 #include <vector>
 #include <functional>
 
@@ -32,40 +33,55 @@ Server::Server(std::shared_ptr<EventLoop>& loop): loop(loop){
     acceptor->set_cb(cb);
 }
 Server::~Server(){
+    for(auto a = connections.begin(); a != connections.end(); a++){
+        delete a->second;
+    }
 }
-int Server::handle_read_event(int client_sockfd){
 
-    char buf[MAX_BUFFER_SIZE];
-    bzero(buf, sizeof(buf));
-    ssize_t read_bytes = read(client_sockfd, buf, sizeof(buf));
-    if(read_bytes > 0){
-        printf("client: %s\n", buf);
-        write(client_sockfd, buf, sizeof(buf));
-        return 1;
-    }
-    else if(read_bytes == 0){
-        close(client_sockfd);
-        printf("Client disconnect\n");
-        return 0;
-    }
-    else{
-        close(client_sockfd);
-        printf("Error reading\n");
-        return -1;
-    }
-}
+
+//Removed after Connection was imported.
+
+//int Server::handle_read_event(int client_sockfd){
+//    char buf[MAX_BUFFER_SIZE];
+//    bzero(buf, sizeof(buf));
+//    ssize_t read_bytes = read(client_sockfd, buf, sizeof(buf));
+//    if(read_bytes > 0){
+//        printf("client: %s\n", buf);
+//        write(client_sockfd, buf, sizeof(buf));
+//        return 1;
+//    }
+//    else if(read_bytes == 0){
+//        close(client_sockfd);
+//        printf("Client disconnect\n");
+//        return 0;
+//    }
+//    else{
+//        close(client_sockfd);
+//        printf("Error reading\n");
+//        return -1;
+//    }
+//}
 
 void Server::new_connection(Socket *server_socket){
-    Socket* listen_socket = server_socket;
-    Socket* client_socket = new Socket(listen_socket->accept());
-   // Socket client_socket = listen_socket.accept();
+   Socket* listen_socket = server_socket;
+   Socket* client_socket = new Socket(listen_socket->accept());
    client_socket->set_non_block();
-   Channel* new_client_channel = new Channel(loop.get(), client_socket->get_sockfd());
-   std::function<void()> cb = std::bind(&Server::handle_read_event, this, new_client_channel->get_fd());
-   new_client_channel->set_callback(cb);
-   new_client_channel->enable_reading();
+   Connection* new_connection = new Connection(loop.get(), client_socket); 
+   // Socket client_socket = listen_socket.accept();
+    this->add_connection(client_socket->get_sockfd(), new_connection);
+    return;
 }
 
+int Server::add_connection(const int sockfd, Connection* new_connection){
+    connections.insert(std::pair<int, Connection*>(sockfd, new_connection));
+    return 0;
+}
+
+int Server::remove_connection(const int sockfd){
+    delete connections[sockfd];
+    connections.erase(sockfd);
+    return 0;
+}
 
 Acceptor::Acceptor(EventLoop* loop):loop(loop){
     listen_socket = new Socket();

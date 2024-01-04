@@ -1,7 +1,11 @@
 #pragma once
+
 #include "Epoll.h"
 #include "Channel.h"
 #include <memory>
+#include <unordered_map>
+
+class Connection;
 class EventLoop{
 private: 
     std::shared_ptr<Epoll> ep;
@@ -20,15 +24,20 @@ private:
     //Reactor
     std::shared_ptr<EventLoop> loop;
     std::shared_ptr<class Acceptor> acceptor; 
+    std::unordered_map<int, Connection*> connections;
+
 public:
     Server(std::shared_ptr<EventLoop>& loop);
     ~Server();
 
 
-    //Acceptor
+    //Acceptor and Connection(Listen Event and TCP Event)
     void new_connection(Socket *server_socket);
+    int add_connection(const int sockfd, Connection* new_connection);
+    int remove_connection(const int sockfd);
     //Handler
-    int handle_read_event(int fd);
+    //After Spliting TCP into Connection object, the read event move into Connection.
+    //int handle_read_event(int fd);
 };
 
 class Acceptor{
