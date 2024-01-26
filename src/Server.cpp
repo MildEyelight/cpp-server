@@ -4,8 +4,8 @@
 #include "Connection.h"
 #include <vector>
 #include <functional>
-
-EventLoop::EventLoop(){
+#include "ThreadPool.h"
+EventLoop::EventLoop():quit(false){
     ep = std::make_shared<Epoll>();
 }
 EventLoop::~EventLoop(){
@@ -14,7 +14,9 @@ void EventLoop::loop(){
     while(true){
         std::vector<Channel*> activate_channels = ep->wait();
         for(Channel* channel: activate_channels){
-            channel->handle_event();
+            std::function<void()> task = std::bind(&Channel::handle_event, channel);
+            worker.add_task(task);
+            //channel->handle_event();
         }
     }
 }

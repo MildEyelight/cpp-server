@@ -2,6 +2,7 @@
 
 #include "Epoll.h"
 #include "Channel.h"
+#include "ThreadPool.h"
 #include <memory>
 #include <unordered_map>
 
@@ -9,6 +10,7 @@ class Connection;
 class EventLoop{
 private: 
     std::shared_ptr<Epoll> ep;
+    ThreadPool worker;
     bool quit;
 public:
     EventLoop();
