@@ -22,7 +22,9 @@ void EventLoop::loop(){
 int EventLoop::update_channel(Channel* channel){
     return ep->update_channel(channel);
 }
-
+int EventLoop::remove_channel(Channel* channel){
+    return ep->remove_channel(channel);
+}
 std::shared_ptr<Epoll> EventLoop::get_epoll() const{
     return ep;
 }
@@ -63,21 +65,25 @@ Server::~Server(){
 //}
 
 void Server::new_connection(Socket *server_socket){
-   Socket* listen_socket = server_socket;
-   Socket* client_socket = new Socket(listen_socket->accept());
-   client_socket->set_non_block();
-   Connection* new_connection = new Connection(loop.get(), client_socket); 
-   // Socket client_socket = listen_socket.accept();
+    Socket* listen_socket = server_socket;
+    Socket* client_socket = new Socket(listen_socket->accept());
+    client_socket->set_non_block();
+    Connection* new_connection = new Connection(loop.get(), client_socket); 
+    new_connection->set_disconnect_cb(std::bind(&Server::remove_connection, this, std::placeholders::_1));
+    // Socket client_socket = listen_socket.accept();
     this->add_connection(client_socket->get_sockfd(), new_connection);
     return;
 }
 
 int Server::add_connection(const int sockfd, Connection* new_connection){
+    printf("New Connection with fd %d\n", sockfd);
     connections.insert(std::pair<int, Connection*>(sockfd, new_connection));
     return 0;
 }
 
+
 int Server::remove_connection(const int sockfd){
+    printf("Disconnect connection with fd %d\n", sockfd);
     delete connections[sockfd];
     connections.erase(sockfd);
     return 0;

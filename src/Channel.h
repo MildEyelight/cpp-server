@@ -7,13 +7,14 @@ class EventLoop;
 class Channel{
 private:
 	EventLoop* loop;
-	int fd;
+	int fd; // TODO: Why not Socket ? 
 	uint32_t events;
 	uint32_t revents;
-	bool is_in_epoll;
+	bool is_in_epoll = false;
 	std::function<void()> cb;
 public:
 	Channel(EventLoop* loop, int fd): loop(loop), fd(fd){}
+	~Channel();
 	int get_fd() const {
 		return fd;
 	}
@@ -37,6 +38,7 @@ public:
 		revents = rev;
 		return;
 	}
+	int disable_reading();
 	int enable_reading();
 	void set_callback(std::function<void()>& cb);
 	void handle_event();

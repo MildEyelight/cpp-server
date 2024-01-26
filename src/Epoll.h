@@ -48,12 +48,18 @@ public:
         ev.data.ptr = ch;
         ev.events = ch->get_events();
         if(ch->get_is_in_epoll()){
-            return  epoll_ctl(_epfd, EPOLL_CTL_MOD, ch->get_fd(), &ev);
+            printf("Update fd %d status in epoll\n", ch->get_fd());
+            return epoll_ctl(_epfd, EPOLL_CTL_MOD, ch->get_fd(), &ev);
         }
         else{
+            printf("Add fd %d to epoll\n", ch->get_fd());
             return epoll_ctl(_epfd, EPOLL_CTL_ADD, ch->get_fd(), &ev);
         }
 
+    }
+    int remove_channel(Channel* ch){
+        printf("Remove fd %d from epoll\n", ch->get_fd());
+        return epoll_ctl(_epfd, EPOLL_CTL_DEL, ch->get_fd(), nullptr);
     }
     std::vector<Channel*> wait(){
         std::vector<Channel*> active_channels;

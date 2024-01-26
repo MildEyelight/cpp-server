@@ -39,7 +39,7 @@ int client_event(const Socket& sock){
 }
 
 int client_event(int sockfd){
-    char buf[MAX_BUFFER_SIZE];
+    char buf[1024];
     memset(buf, 0, sizeof(buf));
     //scanf("%s", buf);
     getline(buf, sizeof(buf), stdin);

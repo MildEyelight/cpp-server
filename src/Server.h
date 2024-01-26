@@ -14,6 +14,7 @@ public:
     EventLoop();
     ~EventLoop();
     void loop();
+    int remove_channel(Channel* channel);
     int update_channel(Channel* channel);
     std::shared_ptr<Epoll> get_epoll() const;
 }
