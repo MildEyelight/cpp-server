@@ -52,13 +52,13 @@ public:
             return epoll_ctl(_epfd, EPOLL_CTL_MOD, ch->get_fd(), &ev);
         }
         else{
-            printf("Add fd %d to epoll\n", ch->get_fd());
+            printf("[SYSTEM INFO]Add fd %d to epoll\n", ch->get_fd());
             return epoll_ctl(_epfd, EPOLL_CTL_ADD, ch->get_fd(), &ev);
         }
 
     }
     int remove_channel(Channel* ch){
-        printf("Remove fd %d from epoll\n", ch->get_fd());
+        printf("[SYSTEM INFO]Remove fd %d from epoll\n", ch->get_fd());
         return epoll_ctl(_epfd, EPOLL_CTL_DEL, ch->get_fd(), nullptr);
     }
     std::vector<Channel*> wait(){

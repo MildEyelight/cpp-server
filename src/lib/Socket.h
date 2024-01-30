@@ -51,7 +51,7 @@ public:
         socklen_t client_addr_len = sizeof(client_addr);
         int client_sockfd = ::accept(_sockfd, (sockaddr*)&client_addr, &client_addr_len); // accept 会发生阻塞。
         errif(client_sockfd == -1, "Accept Socket Error\n");
-        printf("New client fd %d, IP: %s, Port: %d\n", client_sockfd, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port)); 
+        printf("[SYSTEM INFO]New client fd %d, IP: %s, Port: %d\n", client_sockfd, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port)); 
     
         return Socket(client_sockfd);
     }

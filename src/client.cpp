@@ -6,20 +6,20 @@
 #include <iostream>
 #include <string>
 
-#include "Socket.h"
-#include "InetAddress.h"
-#include "event.h"
+#include "lib/Socket.h"
+#include "lib/InetAddress.h"
+#include "lib/event.h"
 
 int main(){
     Socket client_socket;
     InetAddress server_address(SERVER_IP, SERVER_PORT);
     int rc = client_socket.connect(server_address);
     if(rc != -1){
-        printf("Connect to server successfully. Server ip: %s, server port: %d\n", SERVER_IP, SERVER_PORT);
+        printf("[SYSTEM INFO]Connect to server successfully. Server ip: %s, server port: %d\n", SERVER_IP, SERVER_PORT);
     }
     else{
         //可能是ECONNREFUSED 或者 ETIMEDOUT
-        printf("Connect Server Error\n");
+        printf("[SYSTEM INFO]Connect Server Error\n");
         exit(-1);
     }
 

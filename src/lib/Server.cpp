@@ -8,15 +8,15 @@
 EventLoop::EventLoop():quit(false){
     ep = std::make_shared<Epoll>();
 }
+
 EventLoop::~EventLoop(){
 }
+
 void EventLoop::loop(){
     while(true){
         std::vector<Channel*> activate_channels = ep->wait();
         for(Channel* channel: activate_channels){
-            std::function<void()> task = std::bind(&Channel::handle_event, channel);
-            worker.add_task(task);
-            //channel->handle_event();
+            worker.add_task(&Channel::handle_event, channel);
         }
     }
 }
@@ -78,14 +78,14 @@ void Server::new_connection(Socket *server_socket){
 }
 
 int Server::add_connection(const int sockfd, Connection* new_connection){
-    printf("New Connection with fd %d\n", sockfd);
+    printf("[SYSTEM INFO]New Connection with fd %d\n", sockfd);
     connections.insert(std::pair<int, Connection*>(sockfd, new_connection));
     return 0;
 }
 
 
 int Server::remove_connection(const int sockfd){
-    printf("Disconnect connection with fd %d\n", sockfd);
+    printf("[SYSTEM INFO]Disconnect connection with fd %d\n", sockfd);
     delete connections[sockfd];
     connections.erase(sockfd);
     return 0;

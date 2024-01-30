@@ -30,7 +30,7 @@ int Connection::echo(const int client_sockfd){
             read_buffer.append(buf, read_bytes);
         }
         else if(read_bytes == -1 && errno == EINTR){
-            printf("Client dissconnect, continue reading\n");
+            printf("[SYSTEM INFO]Client dissconnect, continue reading\n");
             continue;
         }
         else if(read_bytes == -1 && ((errno == EAGAIN) || errno == EWOULDBLOCK)){
@@ -45,7 +45,7 @@ int Connection::echo(const int client_sockfd){
             break;
         }
         else if(read_bytes == 0){
-            printf("Client disconnected !\n");
+            printf("[SYSTEM INFO]Client disconnected !\n");
             this->disconnect();
             break;
         }
